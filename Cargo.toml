@@ -1,9 +1,19 @@
 [package]
 name = "Rust-ImageResizing-Benchmarks"
 version = "0.1.0"
-authors = ["Kahlil Abreu <kahlil29@gmail.com>"]
+authors = ["Holmusk <tech@holmusk.com>"]
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+# For running a particular binary e.g. raster # cargo run --bin raster
+[[bin]]
+ name = "image"
+ path = "src/Image_Lib.rs"
+
+[[bin]]
+ name = "raster"
+ path = "src/Raster_Lib.rs"
+
 
 [dependencies]
+"image" = "0.23.4"
+"raster" = "0.2.0"
