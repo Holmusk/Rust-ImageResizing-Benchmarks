@@ -12,8 +12,16 @@ edition = "2018"
 [[bin]]
  name = "raster"
  path = "src/Raster_Lib.rs"
+ 
+ [[bin]]
+ name = "resize"
+ path = "src/img_resizing_lambda.rs"
 
 
 [dependencies]
 "image" = "0.23.4"
 "raster" = "0.2.0"
+rusoto_s3 = {version = "0.43.0", default_features = false, features=["rustls"]}
+rusoto_core = {version = "0.43.0", default_features = false, features=["rustls"]}
+futures = "0.3.4"
+bytes = "0.5.4"
