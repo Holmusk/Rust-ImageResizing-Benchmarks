@@ -1,5 +1,5 @@
     use image::{imageops::FilterType, ImageBuffer,GenericImageView};
- mod resize;
+ mod img_resizing_lambda;
     
     fn main(){
         let mut result: Vec<u8> = Vec::new();
@@ -7,12 +7,12 @@
         img.write_to(&mut result, image::ImageOutputFormat::Jpeg(90)).unwrap();
 
        // let image_slice = &[result];
-       let image_resized =  resize::resize_image(&result);
-        let img_resized = match image::load_from_memory(&image_resized) {
+        let image_resized_vec =  img_resizing_lambda::resize_image(&result);
+        let dyn_resized_img = match image::load_from_memory(&image_resized_vec) {
             Ok(image) => image,
             Err(imgerr) => panic!("Couldn't convert image to Image Bytes in test! {}", imgerr),
         };
         
-       assert_eq!(img_resized.dimensions(), (299,299));  
+       assert_eq!(dyn_resized_img.dimensions(), (299,299));  
        
     }

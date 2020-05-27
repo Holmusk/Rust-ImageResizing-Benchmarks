@@ -16,7 +16,7 @@ fn open_scale_image(filename: String){
     let input_file =  Path::new("images/original").join(&filename);
     let img = image::open(input_file).unwrap();
     
-    let scaled = img.resize_exact(299, 299,FilterType:: CatmullRom);
+    let scaled = img.resize_exact(299, 299, FilterType::CatmullRom);
    
     let file = output_file(filename); //to get the filename 
     let path = Path::new("images/resized").join(file);
