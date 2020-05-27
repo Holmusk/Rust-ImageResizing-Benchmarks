@@ -12,6 +12,10 @@ edition = "2018"
 [[bin]]
  name = "raster"
  path = "src/Raster_Lib.rs"
+ 
+ [[bin]]
+ name = "resize"
+ path = "src/img_resizing_lambda.rs"
 
 
 [dependencies]
