@@ -1,16 +1,17 @@
 use futures::TryStreamExt;
-use image::imageops::FilterType;
+use image::{imageops::FilterType, ImageBuffer,GenericImageView};
 use rusoto_core::Region;
 use rusoto_s3::S3Client;
 use rusoto_s3::S3;
 
 const BUCKET_NAME: &str = "rust-image-resizing";
 const IMAGE_NAME: &str = "rust-image.jpg";
-const REGION_NAME: &str = "ApSoutheast1";
+const REGION_NAME: &str = "ap-southeast-1";
 
 fn main() {
     println!("Downloading file from S3 bucket...");
     let awsregion = get_region(REGION_NAME.to_string());
+    println!("Region is {:?}", awsregion);
     let s3 = S3Client::new(awsregion);
     download_img_from_s3(s3, BUCKET_NAME.to_string(), IMAGE_NAME.to_string());
 }
@@ -18,7 +19,7 @@ fn main() {
 fn get_region(aws_region_name : String) -> Region{
   
         match aws_region_name.parse::<Region>() {
-            Ok(valid_region) =>  valid_region,
+            Ok(valid_region) => valid_region,
             // Default fallback Region (Singapore)
             Err(_) =>  Region::ApSoutheast1,
         }
@@ -55,17 +56,23 @@ async fn download_img_from_s3(
     };
     let bytes_mutref = s3_object_bytes_mut.as_ref();
 
-    let resized_image = resize_image(bytes_mutref);
+    let resized_image = resize::resize_image(bytes_mutref);
     let resized_image_slice = &[..resized_image];
 }
 
-fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
+pub mod resize{
+pub fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
+    let mut result: Vec<u8> = Vec::new();
     let image = match image::load_from_memory(bytes_img) {
         Ok(image) => image,
         Err(imgerr) => panic!("Couldn't convert S3 Object to Image Bytes! {}", imgerr),
     };
-    let scaled = image.resize_exact(299, 299, FilterType::CatmullRom).to_bytes();
+    let scaled = image.resize_exact(299, 299, FilterType::CatmullRom);
 
-    return scaled //returning as a vector because cannot return as a reference to local variable
+    scaled.write_to(&mut result, image::ImageOutputFormat::Jpeg(90)).unwrap();
+    return result //returning as a vector because cannot return as a reference to local variable
     
 }
+
+}
+
