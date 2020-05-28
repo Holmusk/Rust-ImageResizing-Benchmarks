@@ -14,7 +14,7 @@ async fn main() {
     println!("Downloading file from S3 bucket...");
     let awsregion = get_region(REGION_NAME.to_string());
     let s3 = S3Client::new(awsregion);
-    let s3_upload =s3.clone();
+    let s3_upload = s3.clone();
     let img_bytes = download_img_from_s3(s3, BUCKET_NAME1.to_string(), IMAGE_NAME.to_string());
     let resized_image = resize_image(&img_bytes.await);
     upload_resized_img_to_s3(
@@ -77,7 +77,7 @@ pub fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
 
     let scaled = image.resize_exact(299, 299, FilterType::CatmullRom);
     match scaled.write_to(&mut img_result, image::ImageOutputFormat::Jpeg(90)) {
-        //setting the jpeg quality to 90      
+        //setting the jpeg quality to 90
         Ok(()) => (),
         Err(write_err) => panic!("Couldn't convert S3 Object to Image Bytes! {}", write_err),
     }
@@ -89,8 +89,7 @@ async fn upload_resized_img_to_s3(
     bucket_name: String,
     img_name: String,
     body: Vec<u8>,
-)  
-{
+) {
     match s3_client
         .put_object(rusoto_s3::PutObjectRequest {
             bucket: bucket_name,
