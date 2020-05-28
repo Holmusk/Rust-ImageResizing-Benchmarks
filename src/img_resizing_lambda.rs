@@ -1,5 +1,5 @@
 use futures::TryStreamExt;
-use image::{imageops::FilterType, ImageBuffer,GenericImageView};
+use image::{imageops::FilterType, GenericImageView, ImageBuffer};
 use rusoto_core::Region;
 use rusoto_s3::S3Client;
 use rusoto_s3::S3;
@@ -16,13 +16,12 @@ fn main() {
     download_img_from_s3(s3, BUCKET_NAME.to_string(), IMAGE_NAME.to_string());
 }
 
-fn get_region(aws_region_name : String) -> Region{
-  
-        match aws_region_name.parse::<Region>() {
-            Ok(valid_region) => valid_region,
-            // Default fallback Region (Singapore)
-            Err(_) =>  Region::ApSoutheast1,
-        }
+fn get_region(aws_region_name: String) -> Region {
+    match aws_region_name.parse::<Region>() {
+        Ok(valid_region) => valid_region,
+        // Default fallback Region (Singapore)
+        Err(_) => Region::ApSoutheast1,
+    }
 }
 
 pub async fn download_img_from_s3(
@@ -58,10 +57,9 @@ pub async fn download_img_from_s3(
 
     let resized_image = resize_image(bytes_mutref);
 }
-    
 
 pub fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
-   let mut img_result: Vec<u8> = Vec::new();
+    let mut img_result: Vec<u8> = Vec::new();
     let image = match image::load_from_memory(bytes_img) {
         Ok(image) => image,
         Err(imgerr) => panic!("Couldn't convert S3 Object to Image Bytes! {}", imgerr),
@@ -69,13 +67,10 @@ pub fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
 
     let scaled = image.resize_exact(299, 299, FilterType::CatmullRom);
 
-    match scaled.write_to(&mut img_result, image::ImageOutputFormat::Jpeg(90)){   //setting the jpeg quality to 90
-        Ok(scaledimg) => scaledimg,
+    match scaled.write_to(&mut img_result, image::ImageOutputFormat::Jpeg(90)) {
+        //setting the jpeg quality to 90
+        Ok(()) => (),
         Err(write_err) => panic!("Couldn't convert S3 Object to Image Bytes! {}", write_err),
     }
-    return img_result 
-
+    return img_result;
 }
-
-
-
