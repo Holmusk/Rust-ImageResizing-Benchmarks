@@ -6,12 +6,13 @@ use rusoto_s3::S3;
 
 const BUCKET_NAME: &str = "rust-image-resizing";
 const IMAGE_NAME: &str = "rust-image.jpg";
-const REGION_NAME: &str = "ApSoutheast1";
+const REGION_NAME: &str = "ap-southeast-1";
 
 #[tokio::main]
 async fn main() {
     println!("Downloading file from S3 bucket...");
     let awsregion = get_region(REGION_NAME.to_string());
+    println!("Region is {:?}", awsregion);
     let s3 = S3Client::new(awsregion);
     let s3_upload = s3.clone();
     let resized_image = download_img_from_s3(s3, BUCKET_NAME.to_string(), IMAGE_NAME.to_string());
@@ -32,7 +33,7 @@ fn get_region(aws_region_name: String) -> Region {
     }
 }
 
-async fn download_img_from_s3(
+pub async fn download_img_from_s3(
     s3_client: rusoto_s3::S3Client,
     bucket_name: String,
     img_name: String,
@@ -68,18 +69,20 @@ async fn download_img_from_s3(
     return resized_image;
 }
 
-fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
-    let mut img_result: Vec<u8> = Vec::new();
+pub fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
 
+    let mut img_result: Vec<u8> = Vec::new();
     let image = match image::load_from_memory(bytes_img) {
         Ok(image) => image,
         Err(imgerr) => panic!("Couldn't convert S3 Object to Image Bytes! {}", imgerr),
     };
+
     let scaled = image.resize_exact(299, 299, FilterType::CatmullRom);
 
     match scaled.write_to(&mut img_result, image::ImageOutputFormat::Jpeg(255)) {
         //setting the jpeg quality to 90
-        Ok(scaledimg) => scaledimg,
+
+        Ok(()) => (),
         Err(write_err) => panic!("Couldn't convert S3 Object to Image Bytes! {}", write_err),
     }
     return img_result;

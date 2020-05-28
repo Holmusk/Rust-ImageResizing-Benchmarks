@@ -16,6 +16,10 @@ edition = "2018"
  [[bin]]
  name = "resize"
  path = "src/img_resizing_lambda.rs"
+ 
+  [[bin]]
+ name = "test"
+ path = "src/test.rs"
 
 
 [dependencies]
