@@ -12,15 +12,15 @@ const REGION_NAME: &str = "ap-southeast-1";
 async fn main() {
     println!("Downloading file from S3 bucket...");
     let awsregion = get_region(REGION_NAME.to_string());
-    println!("Region is {:?}", awsregion);
     let s3 = S3Client::new(awsregion);
-    let s3_upload = s3.clone();
-    let resized_image = download_img_from_s3(s3, BUCKET_NAME.to_string(), IMAGE_NAME.to_string());
+    let s3_upload =s3.clone();
+    let img_bytes = download_img_from_s3(s3, BUCKET_NAME.to_string(), IMAGE_NAME.to_string());
+    let resized_image = resize_image(&img_bytes.await);
     upload_resized_img_to_s3(
-        s3,
+        s3_upload,
         BUCKET_NAME.to_string(),
         IMAGE_NAME.to_string(),
-        resized_image.await,
+        resized_image,
     )
     .await;
 }
@@ -64,13 +64,10 @@ pub async fn download_img_from_s3(
     };
     let bytes_mutref = s3_object_bytes_mut.as_ref();
 
-    let resized_image = resize_image(bytes_mutref);
-
-    return resized_image;
+    return bytes_mutref.to_vec();
 }
 
 pub fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
-
     let mut img_result: Vec<u8> = Vec::new();
     let image = match image::load_from_memory(bytes_img) {
         Ok(image) => image,
@@ -78,10 +75,8 @@ pub fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
     };
 
     let scaled = image.resize_exact(299, 299, FilterType::CatmullRom);
-
-    match scaled.write_to(&mut img_result, image::ImageOutputFormat::Jpeg(255)) {
-        //setting the jpeg quality to 90
-
+    match scaled.write_to(&mut img_result, image::ImageOutputFormat::Jpeg(90)) {
+        //setting the jpeg quality to 90      
         Ok(()) => (),
         Err(write_err) => panic!("Couldn't convert S3 Object to Image Bytes! {}", write_err),
     }
@@ -93,7 +88,7 @@ async fn upload_resized_img_to_s3(
     bucket_name: String,
     img_name: String,
     body: Vec<u8>,
-) /*-> std::result::Result<(), String>*/
+)  
 {
     match s3_client
         .put_object(rusoto_s3::PutObjectRequest {
