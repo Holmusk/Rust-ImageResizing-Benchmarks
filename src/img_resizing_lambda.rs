@@ -4,8 +4,9 @@ use rusoto_core::{ByteStream, Region};
 use rusoto_s3::S3Client;
 use rusoto_s3::S3;
 
-const BUCKET_NAME: &str = "rust-image-resizing";
-const IMAGE_NAME: &str = "rust-image.jpg";
+const BUCKET_NAME1: &str = "kahlil-test-image-upload-bucket";
+const BUCKET_NAME2: &str = "kahlil-test-images-to-be-rated";
+const IMAGE_NAME: &str = "foodImg.jpg";
 const REGION_NAME: &str = "ap-southeast-1";
 
 #[tokio::main]
@@ -14,11 +15,11 @@ async fn main() {
     let awsregion = get_region(REGION_NAME.to_string());
     let s3 = S3Client::new(awsregion);
     let s3_upload =s3.clone();
-    let img_bytes = download_img_from_s3(s3, BUCKET_NAME.to_string(), IMAGE_NAME.to_string());
+    let img_bytes = download_img_from_s3(s3, BUCKET_NAME1.to_string(), IMAGE_NAME.to_string());
     let resized_image = resize_image(&img_bytes.await);
     upload_resized_img_to_s3(
         s3_upload,
-        BUCKET_NAME.to_string(),
+        BUCKET_NAME2.to_string(),
         IMAGE_NAME.to_string(),
         resized_image,
     )
