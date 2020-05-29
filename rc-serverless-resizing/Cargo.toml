@@ -1,0 +1,35 @@
+[package]
+name = "Rust-ImageResizing-Benchmarks"
+version = "0.1.0"
+authors = ["Holmusk <tech@holmusk.com>"]
+edition = "2018"
+
+# For running a particular binary e.g. raster # cargo run --bin raster
+
+ 
+ [[bin]]
+ name = "resize"
+ path = "src/img_resizing_lambda.rs"
+ 
+ [[bin]]
+ name = "lambda"
+ path = "src/lambda_func.rs"
+ 
+
+
+
+[dependencies]
+"image" = "0.23.4"
+"raster" = "0.2.0"
+rusoto_s3 = {version = "0.43.0", default_features = false, features=["rustls"]}
+rusoto_core = {version = "0.43.0", default_features = false, features=["rustls"]}
+futures = "0.3.4"
+bytes = "0.5.4"
+tokio = "0.2.21"
+lambda_runtime = "0.1"
+simple_logger = "1.6.0"
+log = "0.4.8"
+serde = "1.0.110"
+serde_derive = "1.0.110"
+serde_json = "1.0.53"
+aws_lambda_events = "0.3.0"
