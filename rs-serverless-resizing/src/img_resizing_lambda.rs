@@ -3,11 +3,12 @@ use image::imageops::FilterType;
 use rusoto_core::{ByteStream, Region};
 use rusoto_s3::S3Client;
 use rusoto_s3::S3;
+use std::env;
 
 const BUCKET_NAME1: &str = "kahlil-test-image-upload-bucket";
-pub const BUCKET_NAME2: &str = "kahlil-test-images-to-be-rated";
 pub const IMAGE_NAME: &str = "foodImg.jpg";
 const REGION_NAME: &str = "ap-southeast-1";
+
 
 #[tokio::main]
 async fn main() {
@@ -17,9 +18,10 @@ async fn main() {
     let s3_upload = s3.clone();
     let img_bytes = download_img_from_s3(s3, BUCKET_NAME1.to_string(), IMAGE_NAME.to_string());
     let resized_image = resize_image(&img_bytes.await);
+    let out_bucket = env::var("RESIZED_IMAGES_BUCKET_NAME").unwrap(); 
     upload_resized_img_to_s3(
         s3_upload,
-        BUCKET_NAME2.to_string(),
+        &out_bucket.to_string(),
         IMAGE_NAME.to_string(),
         resized_image,
     )

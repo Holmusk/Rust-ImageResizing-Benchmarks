@@ -12,6 +12,9 @@ use serde_json::Value;
 use rusoto_s3::S3Client;
 use rusoto_s3::S3;
 use rusoto_core::Region;
+use std::env;
+
+
 
 mod img_resizing_lambda;
 
@@ -37,14 +40,14 @@ fn handle_event(event: Value, ctx: lambda::Context) -> Result<(), HandlerError> 
     .expect("Could not parse region from record");
     
     let s3 = S3Client::new(region);  
-
+    let out_bucket = env::var("RESIZED_IMAGES_BUCKET_NAME").unwrap();    
     for record in s3_event.records {
-      handle_record(record,s3.clone());
+      handle_record(record,s3.clone(),&out_bucket);
     }
     Ok(())
 }
 
-async fn handle_record(record: S3EventRecord,s3_client: rusoto_s3::S3Client){
+async fn handle_record(record: S3EventRecord,s3_client: rusoto_s3::S3Client, upload_bucket: &String){
     let bucket_name = record
             .s3
             .bucket
@@ -59,9 +62,10 @@ async fn handle_record(record: S3EventRecord,s3_client: rusoto_s3::S3Client){
     let s3_uploadclient = s3_client.clone();
     let download_img = img_resizing_lambda::download_img_from_s3(s3_client,bucket_name,key_name);
     let resized_image = img_resizing_lambda::resize_image(&download_img.await);
+  
     img_resizing_lambda::upload_resized_img_to_s3(
         s3_uploadclient,
-        img_resizing_lambda::BUCKET_NAME2.to_string(),
+        upload_bucket.to_string(),
         img_resizing_lambda::IMAGE_NAME.to_string(),
         resized_image,
     )
