@@ -1,5 +1,5 @@
 [package]
-name = "Rust-ImageResizing-Benchmarks"
+name = "Rust-serverless-ImageResizing"
 version = "0.1.0"
 authors = ["Holmusk <tech@holmusk.com>"]
 edition = "2018"
@@ -8,7 +8,7 @@ edition = "2018"
 
  
  [[bin]]
- name = "resize"
+ name = "resize_rust"
  path = "src/img_resizing_lambda.rs"
  
  [[bin]]
