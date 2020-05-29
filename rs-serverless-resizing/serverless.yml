@@ -1,0 +1,35 @@
+service: rs-serverless-image-resizing
+provider:
+  name: aws
+  runtime: rust
+  region: ap-southeast-1
+  iamRoleStatements:
+    -  Effect: "Allow"
+       Action:
+         - "s3:GetObject"
+       Resource: "arn:aws:s3:::kahlil-test-image-upload-bucket/*"
+    -  Effect: "Allow"
+       Action:
+         - "s3:PutObject"
+       Resource: "arn:aws:s3:::kahlil-test-images-to-be-rated/*"
+plugins:
+  # this adds informs serverless to use
+  # the serverless-rust plugin
+  - serverless-rust
+  - serverless-plugin-existing-s3
+# creates one artifact for each function
+package:
+  individually: true
+functions:
+  rs-serverless-resizing:
+    # handler value syntax is `{cargo-package-name}.{bin-name}`
+    # or `{cargo-package-name}` for short when you are building a
+    # default bin for a given package.
+    handler: Rust-serverless-ImageResizing.lambda
+    environment:
+      RESIZED_IMAGES_BUCKET_NAME: kahlil-test-images-to-be-rated
+    events:
+      - existingS3:
+          bucket: kahlil-test-image-upload-bucket
+          events:
+            - s3:ObjectCreated:*
