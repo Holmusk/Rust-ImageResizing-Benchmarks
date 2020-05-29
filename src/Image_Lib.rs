@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use image::imageops::FilterType;
 use std::env;
 use std::path::Path;

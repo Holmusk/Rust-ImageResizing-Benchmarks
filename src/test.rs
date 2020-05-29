@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use image::{imageops::FilterType, GenericImageView, ImageBuffer};
 mod img_resizing_lambda;
 

@@ -1,3 +1,4 @@
+#![allow(non_snake_case)]
 use futures::TryStreamExt;
 use image::imageops::FilterType;
 use rusoto_core::{ByteStream, Region};
