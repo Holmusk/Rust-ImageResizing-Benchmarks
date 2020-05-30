@@ -4,7 +4,7 @@
 extern crate lambda_runtime as lambda;
 use aws_lambda_events::event::s3::{S3Event, S3EventRecord};
 use lambda::error::HandlerError;
-use log::{self, error, info};
+use log::{self, info};
 use rusoto_core::Region;
 use rusoto_s3::S3Client;
 use serde_json::Value;
@@ -12,11 +12,11 @@ use simple_logger;
 use std::env;
 use std::error::Error;
 
-mod img_resizing_lambda;
+mod resize;
+mod s3_utils;
 
 fn main() -> Result<(), Box<dyn Error>> {
     simple_logger::init_with_level(log::Level::Info).unwrap();
-
     lambda!(handle_event);
     Ok(())
 }
@@ -30,7 +30,7 @@ async fn handle_event(event: Value, ctx: lambda::Context) -> Result<(), HandlerE
             ctx.aws_request_id, s3_err
         ),
     };
-    info!("The event recd by the Lambda is: {}", event);
+
     let region: Region = s3_event.records[0]
         .aws_region
         .as_ref()
@@ -57,20 +57,22 @@ async fn handle_record(
         .name
         .expect("Could not get bucket name from record");
 
-    let key_name = record
+    let image_name = record
         .s3
         .object
         .key
         .expect("Could not get key from object record");
-    let s3_uploadclient = s3_client.clone();
-    let download_img = img_resizing_lambda::download_img_from_s3(s3_client, bucket_name, key_name);
-    let resized_image = img_resizing_lambda::resize_image(&download_img.await);
-
-    img_resizing_lambda::upload_resized_img_to_s3(
-        s3_uploadclient,
+    info!("Downloading image from S3...");
+    let download_img = s3_utils::download_img_from_s3(s3_client.clone(), bucket_name, image_name.clone());
+    info!("Resizing image...");
+    let resized_image = resize::resize_image(&download_img.await);
+    info!("Uploading image to S3...");
+    s3_utils::upload_resized_img_to_s3(
+        s3_client,
         upload_bucket.to_string(),
-        img_resizing_lambda::IMAGE_NAME.to_string(),
+        image_name,
         resized_image,
     )
     .await;
+    info!("Done!");
 }
