@@ -21,7 +21,7 @@ async fn main() {
     let out_bucket = env::var("RESIZED_IMAGES_BUCKET_NAME").unwrap(); 
     upload_resized_img_to_s3(
         s3_upload,
-        &out_bucket.to_string(),
+        out_bucket.to_string(),
         IMAGE_NAME.to_string(),
         resized_image,
     )
