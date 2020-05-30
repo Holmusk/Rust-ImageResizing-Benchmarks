@@ -3,7 +3,7 @@
 #[macro_use]
 extern crate lambda_runtime as lambda;
 use std::error::Error;
-use log::{self, error};
+use log::{self, info, error};
 use lambda::error::HandlerError;
 use simple_logger;
 use aws_lambda_events::event::s3::{S3Event, S3EventRecord};
@@ -31,7 +31,7 @@ async fn handle_event(event: Value, ctx: lambda::Context) -> Result<(), HandlerE
         Ok(s3_json) => s3_json,
         Err(s3_err) => panic!("Failed to convert S3 event to json object for aws request Id {} , error is {}",ctx.aws_request_id,s3_err),
         };
-
+    info!("The event recd by the Lambda is: {}",event);
     let region: Region = s3_event.records[0]
     .aws_region.as_ref()
     .expect("Could not get region from record")
