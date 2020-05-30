@@ -1,5 +1,5 @@
 use futures::TryStreamExt;
-use rusoto_core::{ByteStream};
+use rusoto_core::ByteStream;
 use rusoto_s3::S3;
 
 pub async fn download_img_from_s3(

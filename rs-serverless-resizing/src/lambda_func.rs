@@ -63,7 +63,8 @@ async fn handle_record(
         .key
         .expect("Could not get key from object record");
     info!("Downloading image from S3...");
-    let download_img = s3_utils::download_img_from_s3(s3_client.clone(), bucket_name, image_name.clone());
+    let download_img =
+        s3_utils::download_img_from_s3(s3_client.clone(), bucket_name, image_name.clone());
     info!("Resizing image...");
     let resized_image = resize::resize_image(&download_img.await);
     info!("Uploading image to S3...");
