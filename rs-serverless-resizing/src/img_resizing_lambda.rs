@@ -9,7 +9,6 @@ const BUCKET_NAME1: &str = "kahlil-test-image-upload-bucket";
 pub const IMAGE_NAME: &str = "foodImg.jpg";
 const REGION_NAME: &str = "ap-southeast-1";
 
-
 #[tokio::main]
 async fn main() {
     println!("Downloading file from S3 bucket...");
@@ -18,7 +17,7 @@ async fn main() {
     let s3_upload = s3.clone();
     let img_bytes = download_img_from_s3(s3, BUCKET_NAME1.to_string(), IMAGE_NAME.to_string());
     let resized_image = resize_image(&img_bytes.await);
-    let out_bucket = env::var("RESIZED_IMAGES_BUCKET_NAME").unwrap(); 
+    let out_bucket = env::var("RESIZED_IMAGES_BUCKET_NAME").unwrap();
     upload_resized_img_to_s3(
         s3_upload,
         out_bucket.to_string(),
