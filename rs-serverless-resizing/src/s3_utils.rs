@@ -33,7 +33,7 @@ pub async fn download_img_from_s3(
     };
     let bytes_mutref = s3_object_bytes_mut.as_ref();
 
-    return bytes_mutref.to_vec();
+    bytes_mutref.to_vec()
 }
 
 pub async fn upload_resized_img_to_s3(

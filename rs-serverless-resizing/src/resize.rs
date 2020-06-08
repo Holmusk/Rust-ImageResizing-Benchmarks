@@ -13,5 +13,5 @@ pub fn resize_image(bytes_img: &[u8]) -> Vec<u8> {
         Ok(()) => (),
         Err(write_err) => panic!("Couldn't convert S3 Object to Image Bytes! {}", write_err),
     }
-    return img_result;
+    img_result
 }

@@ -8,7 +8,6 @@ use log::{self, info};
 use rusoto_core::Region;
 use rusoto_s3::S3Client;
 use serde_json::Value;
-use simple_logger;
 use std::env;
 use std::error::Error;
 
