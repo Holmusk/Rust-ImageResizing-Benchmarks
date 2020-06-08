@@ -1,4 +1,4 @@
-/target
-*.lock
+initial-resizing-project/target
+initial-resizing-project/*.lock
 
 images/
