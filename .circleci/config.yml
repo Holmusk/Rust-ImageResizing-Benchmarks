@@ -9,22 +9,19 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Go (cd) into serverless (Lambda) project folder
-          command: cd rs-serverless-resizing
-      - run:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
       # If you have committed your Cargo.lock file to version control
       # delete this step.
       - run:
           name: Calculate dependencies
-          command: cargo generate-lockfile
+          command: cd rs-serverless-resizing && cargo generate-lockfile
       - restore_cache:
           keys:
             - v1-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           name: Build the AWS Lambda binary executable
-          command: cargo build --bin lambda
+          command: cd rs-serverless-resizing && cargo build --bin lambda
       - save_cache:
           paths:
             - /usr/local/cargo/registry
@@ -34,16 +31,13 @@ jobs:
           key: v1-cargo-cache-{{ arch }}-{{ checksum "Cargo.lock" }}
       - run:
           name: Run all tests
-          command: cargo test
+          command: cd rs-serverless-resizing && cargo test
 
   security:
     docker:
       - image: circleci/rust
     steps:
       - checkout
-      - run:
-          name: Go (cd) into serverless (Lambda) project folder
-          command: cd rs-serverless-resizing
       - run:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
@@ -56,14 +50,14 @@ jobs:
             - v1-cargo-audit-{{ arch }}
       - run:
           name: Install dependency auditing tool
-          command: cargo install cargo-audit
+          command: cd rs-serverless-resizing && cargo install cargo-audit
       - save_cache:
           paths:
             - /usr/local/cargo
           key: v1-cargo-audit-{{ arch }}
       - run:
           name: Check for known security issues in dependencies
-          command: cargo audit
+          command: cd rs-serverless-resizing && cargo audit
 
   format:
     docker:
@@ -81,16 +75,13 @@ jobs:
           command: rustup component add rustfmt
       - run:
           name: Formatting
-          command: cargo fmt --all -- --check
+          command: cd rs-serverless-resizing && cargo fmt --all -- --check
 
   lint:
     docker:
       - image: circleci/rust
     steps:
-      - checkout
-      - run:
-          name: Go (cd) into serverless (Lambda) project folder
-          command: cd rs-serverless-resizing      
+      - checkout     
       - run:
           name: Version information
           command: rustc --version; cargo --version; rustup --version
@@ -99,15 +90,12 @@ jobs:
           command: rustup component add clippy
       - run:
           name: Linting
-          command: cargo clippy -- -D warnings
+          command: cd rs-serverless-resizing && cargo clippy -- -D warnings
 
   coverage:
     machine: true
     steps:
       - checkout
-      - run:
-          name: Go (cd) into serverless (Lambda) project folder
-          command: cd rs-serverless-resizing
       - run:
           name: Coverage with docker
           command: docker run --security-opt seccomp=unconfined -v "${PWD}:/volume" xd009642/tarpaulin cargo tarpaulin --ignore-tests
