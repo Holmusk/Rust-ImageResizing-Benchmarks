@@ -48,7 +48,7 @@ async fn handle_event(event: Value, ctx: lambda::Context) -> Result<(), HandlerE
 async fn handle_record(
     record: S3EventRecord,
     s3_client: rusoto_s3::S3Client,
-    upload_bucket: &String,
+    upload_bucket: &str,
 ) {
     let bucket_name = record
         .s3
